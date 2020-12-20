@@ -37,9 +37,9 @@ function getBalanceChars(){
 
 function pairSort(a,b){
   if (a[0] == b[0]){
-    return a[1] > b[1];
+    return (a[1] > b[1] ? 1 : -1);
   }
-  return a[0] > b[0];
+  return (a[0] > b[0] ? 1 : -1);
 }
 
 function parse(input, arr){
@@ -79,7 +79,7 @@ function parse(input, arr){
     mismatched.push(rhs.pop()[1]);
   }
   //TODO: Figure out a way to keep checking
-  return mismatched.sort();
+  return mismatched.sort(pairSort);
 }
 
 function check(){
@@ -107,17 +107,18 @@ function check(){
     resBan.classList.remove("bg-danger");
     resBan.classList.remove("bg-success");
     resBan.classList.add("bg-warning");
-    //TODO: Only print first 10 or so position
-    resBan.innerHTML = "<center class='text-muted'>Mismatched characters at positions (line, column) " 
+    
+    var str = "";
     for(var i = 0; i < mismatched.length - 1; ++i){
-      if (i == 10){
-        resBan.innerHTML += "..., ";
+      if (i == 15){
+        str += "..., ";
         break;
       }
-      resBan.innerHTML += "(" + mismatched[i] + "), ";
+      str += "(" + mismatched[i] + "), ";
     }
-    resBan.innerHTML += "(" + mismatched[mismatched.length - 1] + ")";
-    resBan.innerHTML += "</center>";
+    str += "(" + mismatched[mismatched.length - 1] + ")";
+    
+    resBan.innerHTML = "<center class='text-muted'>" + mismatched.length + " mismatched characters at positions (line, column): <br/>" + str + "</center>";
     return;
   }
   
