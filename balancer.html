@@ -18,6 +18,7 @@
     
     <title>Balancer</title>
     <link rel="stylesheet" href="style.css">
+    <script src="js/checker.js"></script>
     
     <!-- Code Mirror For line numbers
     <link rel="stylesheet" href="lib/codemirror.css">
@@ -34,10 +35,11 @@
     </div>
     <div class="container bg-light">
       <div class="row">
+        <div class="text-white-50" id="resultBanner"></div>
         <div class="col-sm-3">
         
           <!-- Settings -->
-          <div>
+          <div class="mt-3">
             <center>
               <h4>
                 Settings
@@ -82,7 +84,7 @@
           
           <!-- Submit Button -->
           <center class="my-3">
-            <button type="submit" class="btn btn-primary">Check</button>
+            <button type="submit" class="btn btn-primary" onclick="check()">Check</button>
           </center>
           
         </div>
@@ -92,7 +94,7 @@
         <div class="col">
           
           <!-- Input Text Box -->
-          <div class="form-group">
+          <div class="form-group mt-3">
             <label for="inputText">Paste text below</label>
             <textarea class="form-control" id="inputText" rows="16"></textarea>
           </div>
