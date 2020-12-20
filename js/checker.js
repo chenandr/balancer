@@ -35,34 +35,44 @@ function getBalanceChars(){
   return arr;
 }
 
+function pairSort(a,b){
+  if (a[0] == b[0]){
+    return a[1] > b[1];
+  }
+  return a[0] > b[0];
+}
+
 function parse(input, arr){
-  var mismatched = [];
+  var lines = input.split('\n');
+  var mismatched = []; //Format as line, col
   var rhs = new Stack();
-  for(var i = 0; i < input.length; ++i){
-    inChar = input[i];
-    
-    for (var j = 0; j < arr.length; ++j){
-      if (inChar == arr[j][0]){
-        //LHS Character --> Push corresponding RHS character and index
-        rhs.push([arr[j][1], i + 1]);
-      }
-      else if (inChar == arr[j][1]){
-        //RHS Character --> Check if on stack
-        if (rhs.empty()){
-          mismatched.push(i + 1);
-          break;
+  for (var l = 0; l < lines.length; ++l){
+    var line = lines[l];
+    for(var i = 0; i < line.length; ++i){
+      inChar = line[i];
+      
+      for (var j = 0; j < arr.length; ++j){
+        if (inChar == arr[j][0]){
+          //LHS Character --> Push corresponding RHS character and line, col position
+          rhs.push([arr[j][1], [l + 1, i + 1]]);
         }
-        else if (inChar == (rhs.top()[0])){
-          rhs.pop();
-          break;
-        }
-        else{
-          mismatched.push(i + 1);
-          break;
+        else if (inChar == arr[j][1]){
+          //RHS Character --> Check if on stack
+          if (rhs.empty()){
+            mismatched.push([l + 1,i + 1]);
+            break;
+          }
+          else if (inChar == (rhs.top()[0])){
+            rhs.pop();
+            break;
+          }
+          else{
+            mismatched.push([l + 1,i + 1]);
+            break;
+          }
         }
       }
     }
-    
   }
   //Add anything for non-empty stack
   for(; !rhs.empty();){
@@ -98,7 +108,16 @@ function check(){
     resBan.classList.remove("bg-success");
     resBan.classList.add("bg-warning");
     //TODO: Only print first 10 or so position
-    resBan.innerHTML = "<center class='text-muted'>Mismatched characters at positions " + mismatched + "</center>";
+    resBan.innerHTML = "<center class='text-muted'>Mismatched characters at positions (line, column) " 
+    for(var i = 0; i < mismatched.length - 1; ++i){
+      if (i == 10){
+        resBan.innerHTML += "..., ";
+        break;
+      }
+      resBan.innerHTML += "(" + mismatched[i] + "), ";
+    }
+    resBan.innerHTML += "(" + mismatched[mismatched.length - 1] + ")";
+    resBan.innerHTML += "</center>";
     return;
   }
   
