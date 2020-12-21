@@ -44,15 +44,8 @@ function mismatchSort(a,b){
 
 function parse(input, arr){
   var lines = input.split('\n');
-  var mismatched = []; //Format as [line, col], length
-  
-  //rhs is array of Stacks : One for each of the balance strings
-  var rhs = [];
-  
-  for (var j = 0; j < arr.length; ++j){
-    rhs.push(new Stack());
-  }
-  
+  var mismatched = []; //Format as line, col
+  var rhs = new Stack();
   for (var l = 0; l < lines.length; ++l){
     var line = lines[l];
     for(var i = 0; i < line.length; ++i){
@@ -60,21 +53,21 @@ function parse(input, arr){
       
       for (var j = 0; j < arr.length; ++j){
         if (inChar == arr[j][0]){
-          //LHS Character --> Push corresponding RHS character and [line, col position]
-          rhs[j].push([arr[j][1], [l + 1, i + 1]]);
+          //LHS Character --> Push character index and line, col position
+          rhs.push([j, [l + 1, i + 1]]);
         }
         else if (inChar == arr[j][1]){
           //RHS Character --> Check if on stack
-          if (rhs[j].empty()){
-            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
+          if (rhs.empty()){
+            mismatched.push([l + 1,i + 1], arr[j][1].length);
             break;
           }
-          else if (inChar == (rhs[j].top()[0])){
-            rhs[j].pop();
+          else if (j == (rhs.top()[0])){
+            rhs.pop();
             break;
           }
           else{
-            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
+            mismatched.push([l + 1,i + 1], arr[j][1].length);
             break;
           }
         }
@@ -82,12 +75,12 @@ function parse(input, arr){
     }
   }
   //Add anything for non-empty stack
-  for (var j = 0; j < arr.length; ++j){
-    for (; !rhs[j].empty();){
-      mismatched.push([rhs[j].pop()[1], arr[j][0].length]);
-    }
+  for(; !rhs.empty();){
+    var top = rhs.pop();
+    mismatched.push(top[1], arr[top[0]][0].length);
   }
-  
+  alert(1);
+  //TODO: Figure out a way to keep checking
   return mismatched.sort(mismatchSort);
 }
 
@@ -116,14 +109,13 @@ function check(){
     return;
   }
   var mismatched = parse(input, arr);
-  
+  alert(mismatched);
   //Unblalanced text: Change result banner, print error locations, mark in textArea
   if(mismatched.length != 0){
     var resBan = document.getElementById("resultBanner");
     resBan.classList.remove("bg-danger");
     resBan.classList.remove("bg-success");
     resBan.classList.add("bg-warning");
-    
     var str = "";
     for(var i = 0; i < mismatched.length - 1; ++i){
       if (i == 15){
