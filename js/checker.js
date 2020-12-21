@@ -35,17 +35,24 @@ function getBalanceChars(){
   return arr;
 }
 
-function pairSort(a,b){
-  if (a[0] == b[0]){
-    return (a[1] > b[1] ? 1 : -1);
+function mismatchSort(a,b){
+  if (a[0][0] == b[0][0]){
+    return (a[0][1] > b[0][1] ? 1 : -1);
   }
-  return (a[0] > b[0] ? 1 : -1);
+  return (a[0][0] > b[0][0] ? 1 : -1);
 }
 
 function parse(input, arr){
   var lines = input.split('\n');
-  var mismatched = []; //Format as line, col
-  var rhs = new Stack();
+  var mismatched = []; //Format as [line, col], length
+  
+  //rhs is array of Stacks : One for each of the balance strings
+  var rhs = [];
+  
+  for (var j = 0; j < arr.length; ++j){
+    rhs.push(new Stack());
+  }
+  
   for (var l = 0; l < lines.length; ++l){
     var line = lines[l];
     for(var i = 0; i < line.length; ++i){
@@ -53,21 +60,21 @@ function parse(input, arr){
       
       for (var j = 0; j < arr.length; ++j){
         if (inChar == arr[j][0]){
-          //LHS Character --> Push corresponding RHS character and line, col position
-          rhs.push([arr[j][1], [l + 1, i + 1]]);
+          //LHS Character --> Push corresponding RHS character and [line, col position]
+          rhs[j].push([arr[j][1], [l + 1, i + 1]]);
         }
         else if (inChar == arr[j][1]){
           //RHS Character --> Check if on stack
-          if (rhs.empty()){
-            mismatched.push([l + 1,i + 1]);
+          if (rhs[j].empty()){
+            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
             break;
           }
-          else if (inChar == (rhs.top()[0])){
-            rhs.pop();
+          else if (inChar == (rhs[j].top()[0])){
+            rhs[j].pop();
             break;
           }
           else{
-            mismatched.push([l + 1,i + 1]);
+            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
             break;
           }
         }
@@ -75,16 +82,24 @@ function parse(input, arr){
     }
   }
   //Add anything for non-empty stack
-  for(; !rhs.empty();){
-    mismatched.push(rhs.pop()[1]);
+  for (var j = 0; j < arr.length; ++j){
+    for (; !rhs[j].empty();){
+      mismatched.push([rhs[j].pop()[1], arr[j][0].length]);
+    }
   }
-  //TODO: Figure out a way to keep checking
-  return mismatched.sort(pairSort);
+  
+  return mismatched.sort(mismatchSort);
 }
 
 function check(){
-  var input = document.getElementById("inputText").value;
-  let re = /bg-.*/;
+  var input = inputEditor.getValue();
+  
+  var doc = inputEditor.getDoc();
+  //Clear any previous markings
+  marks = doc.getAllMarks();
+  marks.forEach(function(mark){
+    mark.clear();
+  })
   
   if (!input) {
     var resBan = document.getElementById("resultBanner");
@@ -102,6 +117,7 @@ function check(){
   }
   var mismatched = parse(input, arr);
   
+  //Unblalanced text: Change result banner, print error locations, mark in textArea
   if(mismatched.length != 0){
     var resBan = document.getElementById("resultBanner");
     resBan.classList.remove("bg-danger");
@@ -114,11 +130,19 @@ function check(){
         str += "..., ";
         break;
       }
-      str += "(" + mismatched[i] + "), ";
+      str += "(" + mismatched[i][0] + "), ";
     }
-    str += "(" + mismatched[mismatched.length - 1] + ")";
+    str += "(" + mismatched[mismatched.length - 1][0] + ")";
     
-    resBan.innerHTML = "<center class='text-muted'>" + mismatched.length + " mismatched characters at positions (line, column): <br/>" + str + "</center>";
+    resBan.innerHTML = "<center class='text-muted'>" + mismatched.length + " mismatched strings at positions (line, column): <br/>" + str + "</center>";
+    
+    //Mark the mismatched balance strings
+    for(var i = 0; i < mismatched.length; ++i){
+      row = mismatched[i][0][0] - 1;
+      col = mismatched[i][0][1] - 1;
+      doc.markText({line: row, ch: col}, {line: row, ch: col + mismatched[i][1]}, {css: "background-color: rgba(255, 0, 0, 0.4)"});
+    }
+    
     return;
   }
   

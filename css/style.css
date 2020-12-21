@@ -5,3 +5,8 @@
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
+.CM-gutter-bg {
+  background-color: #606060;
+  color: black;
+}

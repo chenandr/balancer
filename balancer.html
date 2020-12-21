@@ -17,16 +17,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <title>Balancer</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <script src="js/checker.js"></script>
     
-    <!-- Code Mirror For line numbers
-    <link rel="stylesheet" href="lib/codemirror.css">
-    <script src="lib/codemirror.js"></script>
-    <script>
-      var inputBox = CodeMirror.fromTextArea(document.getElementById("inputText"), {lineNumbers: true});
-    </script>
-    -->
+    <!-- Code Mirror For line numbers -->
+    <link rel="stylesheet" type="text/css" href="codemirror/lib/codemirror.css">
     
   </head>
   <body class="bg-dark">
@@ -35,7 +30,7 @@
     </div>
     <div class="container bg-light">
       <div class="row">
-        <div class="text-white-50" id="resultBanner"></div>
+        <div class="text-white-50 border-bottom border-secondary" id="resultBanner"></div>
         <div class="col-sm-3">
         
           <!-- Settings -->
@@ -96,7 +91,14 @@
           <!-- Input Text Box -->
           <div class="form-group mt-3">
             <label for="inputText">Paste text below</label>
-            <textarea class="form-control" id="inputText" rows="16"></textarea>
+            <textarea class="form-control" id="inputText" rows="20"></textarea>
+            
+            <script src="codemirror/lib/codemirror.js" type="text/javascript"></script>
+            <script>
+              var inputEditor = new CodeMirror.fromTextArea(document.getElementById("inputText"), {
+                lineNumbers: true
+              });
+            </script>
           </div>
           
           <!-- Input File Selection -->
