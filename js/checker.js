@@ -59,7 +59,7 @@ function parse(input, arr){
         else if (inChar == arr[j][1]){
           //RHS Character --> Check if on stack
           if (rhs.empty()){
-            mismatched.push([l + 1,i + 1], arr[j][1].length);
+            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
             break;
           }
           else if (j == (rhs.top()[0])){
@@ -67,7 +67,7 @@ function parse(input, arr){
             break;
           }
           else{
-            mismatched.push([l + 1,i + 1], arr[j][1].length);
+            mismatched.push([[l + 1,i + 1], arr[j][1].length]);
             break;
           }
         }
@@ -77,10 +77,8 @@ function parse(input, arr){
   //Add anything for non-empty stack
   for(; !rhs.empty();){
     var top = rhs.pop();
-    mismatched.push(top[1], arr[top[0]][0].length);
+    mismatched.push([top[1], arr[top[0]][0].length]);
   }
-  alert(1);
-  //TODO: Figure out a way to keep checking
   return mismatched.sort(mismatchSort);
 }
 
@@ -109,7 +107,7 @@ function check(){
     return;
   }
   var mismatched = parse(input, arr);
-  alert(mismatched);
+  
   //Unblalanced text: Change result banner, print error locations, mark in textArea
   if(mismatched.length != 0){
     var resBan = document.getElementById("resultBanner");
