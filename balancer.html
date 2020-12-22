@@ -72,10 +72,44 @@
             </label>
           </div>
           
+          
+          <div class="container-flex mt-1" id="extraFields">
+            <center>
+              <h6>
+                Custom Strings
+              </h6>
+            </center>
+            
+            <div id="added_strings"></div>
+            <center>
+              <div class="text-white-50 bg-danger mb-1" id="custom_error_banner"></div>
+            </center>
+            <div class="row">
+              <div class="col">
+                <textarea class="form-control-sm form-control fixed-size" id="custom_left" rows="1" placeholder="left"></textarea> 
+              </div>
+              <div class="col">
+                <textarea class="form-control form-control-sm fixed-size" id="custom_right" rows="1" placeholder="right"></textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="container mt-3">
+            <div class="row">
+              <div class="col">
+                <input type="button" class="btn btn-secondary btn-sm" style="float: right;" onclick="add_element()" value="    Add    " />
+              </div>
+              <div class="col">
+                <input id="remove_button" type="button" class="btn btn-secondary btn-sm" style="display: none" onclick="rm_element()" value=" Remove " />
+              </div>
+            </div>
+          </div>
+          <!--
           <div class="form-group my-5">
             <label for="inputText">Other characters</label>
             <textarea class="form-control" id="custom" rows="7" placeholder="Enter as comma separated pairs: a,b c,d ef,gh"></textarea>
           </div>
+          -->
           
           <!-- Submit Button -->
           <center class="my-3">
@@ -101,11 +135,12 @@
             </script>
           </div>
           
-          <!-- Input File Selection -->
+          <!-- Input File Selection 
           <div>
             <label class="form-label" for="inputFile">Or choose a file</label>
             <input type="file" class="form-control form-control" id="inputFile" style="width: 236px" />
           </div>
+          -->
         </div>
       </div>
     </div>

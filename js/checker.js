@@ -17,7 +17,8 @@ class Stack{
 }
 
 function getBalanceChars(){
-  //TODO: add custom characters and check for overlap
+  //TODO: add custom characters and check for overlap --> Put into set and see if repeat --> Cannot have direct substrings <,> and <html>, </html>
+  //Or maybe just sort by length
   var arr = [];
   
   if (document.getElementById("bracesCheck").checked){
@@ -49,14 +50,16 @@ function parse(input, arr){
   for (var l = 0; l < lines.length; ++l){
     var line = lines[l];
     for(var i = 0; i < line.length; ++i){
-      inChar = line[i];
+      //inChar = line[i];
       
       for (var j = 0; j < arr.length; ++j){
+        var inChar = line.substring(i, i+arr[j][0].length);
         if (inChar == arr[j][0]){
           //LHS Character --> Push character index and line, col position
           rhs.push([j, [l + 1, i + 1]]);
         }
-        else if (inChar == arr[j][1]){
+        inChar = line.substring(i, i+arr[j][1].length);
+        if (inChar == arr[j][1]){
           //RHS Character --> Check if on stack
           if (rhs.empty()){
             mismatched.push([[l + 1,i + 1], arr[j][1].length]);
@@ -84,7 +87,7 @@ function parse(input, arr){
 
 function check(){
   var input = inputEditor.getValue();
-  
+  document.getElementById("custom_error_banner").innerHTML="";
   var doc = inputEditor.getDoc();
   //Clear any previous markings
   marks = doc.getAllMarks();
@@ -142,4 +145,63 @@ function check(){
   resBan.classList.add("bg-success");
   resBan.innerHTML = "<center>Input is balanced!</center>";
   return;
+}
+
+var num_custom=0;
+
+function add_element(){
+  //TODO: Check fields
+  var input_left=document.getElementById("custom_left").value;
+  if(!input_left){
+    document.getElementById("custom_error_banner").innerHTML="Fill out both fields!";
+    return;
+  }
+  var input_right=document.getElementById("custom_right").value;
+  if(!input_right){
+    document.getElementById("custom_error_banner").innerHTML="Fill out both fields!";
+    return;
+  }
+  if(input_left==input_right){
+    document.getElementById("custom_error_banner").innerHTML="Left and Right must be different!";
+    return;
+  }
+  if(input_left.length != input_right.length){ //Check for substrings
+    var larger;
+    var smaller;
+    var str;
+    if (input_left.length > input_right.length){
+      larger = input_left;
+      smaller = input_right;
+      str = "Right cannot be a substring of Left!"
+    }
+    else{
+      larger = input_right;
+      smaller = input_right;
+      str = "Left cannot be a substring of Right!"
+    }
+    
+    for (start = 0; start < larger.length - smaller.length; ++start){
+      if (smaller == larger.substring(start, smaller.length)){
+        document.getElementById("custom_error_banner").innerHTML=str;
+        return;
+      }
+    }
+  }
+  //Add Element
+  num_custom += 1;
+  
+  //Clear error banner
+  document.getElementById("custom_error_banner").innerHTML="";
+  
+  rm_btn = document.getElementById("remove_button");
+  rm_btn.style.display = "block";
+}
+
+function rm_element(){
+  //TODO: Remove Element
+  
+  if(num_custom == 0){
+    rm_btn = document.getElementById("remove_button");
+    rm_btn.style.display="none";
+  }
 }
