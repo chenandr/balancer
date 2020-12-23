@@ -16,23 +16,48 @@ class Stack{
   }
 }
 
+var num_custom=0;
+var cust_arr = [];
+
 function getBalanceChars(){
-  //TODO: add custom characters and check for overlap --> Put into set and see if repeat --> Cannot have direct substrings <,> and <html>, </html>
-  //Or maybe just sort by length
   var arr = [];
+  var char_set = new Set();
   
   if (document.getElementById("bracesCheck").checked){
     arr.push(['{','}']);
+    char_set.add('{');
+    char_set.add('{');
   }
   if (document.getElementById("bracketsCheck").checked){
     arr.push(['[',']']);
+    char_set.add('[');
+    char_set.add(']');
   }
   if (document.getElementById("parenthesesCheck").checked){
     arr.push(['(',')']);
+    char_set.add('(');
+    char_set.add(')');
   }
   if (document.getElementById("tagsCheck").checked){
     arr.push(['<','>']);
+    char_set.add('<');
+    char_set.add('>');
   }
+  
+  //Custom Pairs
+  for (var i = 0; i < num_custom; ++i){
+    var check = document.getElementById("custom-" + i);
+    if (check.checked){
+      if (char_set.has(cust_arr[i][0]) || char_set.has(cust_arr[i][1])){
+        document.getElementById("custom_error_banner").innerHTML="Selections cannot overlap!";
+        return false;
+      }
+      arr.push(cust_arr[i]);
+      char_set.add(cust_arr[i][0]);
+      char_set.add(cust_arr[i][1]);
+    }
+  }
+  
   return arr;
 }
 
@@ -50,15 +75,13 @@ function parse(input, arr){
   for (var l = 0; l < lines.length; ++l){
     var line = lines[l];
     for(var i = 0; i < line.length; ++i){
-      //inChar = line[i];
+      var inChar = line[i];
       
       for (var j = 0; j < arr.length; ++j){
-        var inChar = line.substring(i, i+arr[j][0].length);
         if (inChar == arr[j][0]){
           //LHS Character --> Push character index and line, col position
           rhs.push([j, [l + 1, i + 1]]);
         }
-        inChar = line.substring(i, i+arr[j][1].length);
         if (inChar == arr[j][1]){
           //RHS Character --> Check if on stack
           if (rhs.empty()){
@@ -103,6 +126,9 @@ function check(){
   }
   
   arr = getBalanceChars();
+  if (!arr){
+    return;
+  }
   if (arr.length==0){
     var resBan = document.getElementById("resultBanner");
     resBan.classList.add("bg-danger");
@@ -147,10 +173,12 @@ function check(){
   return;
 }
 
-var num_custom=0;
-
 function add_element(){
-  //TODO: Check fields
+  //TODO: Check if same as others
+  if (num_custom > 9){
+    document.getElementById("custom_error_banner").innerHTML="Cannot add more pairs!";
+    return;
+  }
   var input_left=document.getElementById("custom_left").value;
   if(!input_left){
     document.getElementById("custom_error_banner").innerHTML="Fill out both fields!";
@@ -165,33 +193,25 @@ function add_element(){
     document.getElementById("custom_error_banner").innerHTML="Left and Right must be different!";
     return;
   }
-  if(input_left.length != input_right.length){ //Check for substrings
-    var larger;
-    var smaller;
-    var str;
-    if (input_left.length > input_right.length){
-      larger = input_left;
-      smaller = input_right;
-      str = "Right cannot be a substring of Left!"
-    }
-    else{
-      larger = input_right;
-      smaller = input_right;
-      str = "Left cannot be a substring of Right!"
-    }
-    
-    for (start = 0; start < larger.length - smaller.length; ++start){
-      if (smaller == larger.substring(start, smaller.length)){
-        document.getElementById("custom_error_banner").innerHTML=str;
-        return;
-      }
+  
+  for(var i = 0; i < cust_arr.length; ++i){
+    if(input_left == cust_arr[i][0] && input_right == cust_arr[i][1]){
+      document.getElementById("custom_error_banner").innerHTML="Pair already added!";
+      return;
     }
   }
+  
   //Add Element
+  cust_arr.push([input_left,input_right]);
+  var added_strings = document.getElementById("added_strings");
+  
+  added_strings.innerHTML += '<div class="form-check" id="cust_str-' + num_custom + '"><input class="form-check-input" type="checkbox" id="custom-'+ num_custom + '">' + '<label class="form-check-label" for="custom-' + num_custom + '">' + input_left + ' ... ' + input_right + '</label></div>';  
   num_custom += 1;
   
   //Clear error banner
   document.getElementById("custom_error_banner").innerHTML="";
+  document.getElementById("custom_left").value = "";
+  document.getElementById("custom_right").value = "";
   
   rm_btn = document.getElementById("remove_button");
   rm_btn.style.display = "block";
@@ -199,6 +219,9 @@ function add_element(){
 
 function rm_element(){
   //TODO: Remove Element
+  num_custom -= 1;
+  cust_arr.pop();
+  document.getElementById("cust_str-" + num_custom).remove();
   
   if(num_custom == 0){
     rm_btn = document.getElementById("remove_button");
